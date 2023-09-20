@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -12,6 +12,10 @@ export class UsuariosService {
       throw new BadRequestException('Email já cadastrado');
     }
 
+    if (await this.db.usuario.findUnique({ where: { nomeUsuario: createUsuarioDto.nomeUsuario } })) {
+      throw new BadRequestException('Nome de usuário já cadastrado');
+    }
+
     return this.db.usuario.create({ data: createUsuarioDto });
   }
 
@@ -19,8 +23,13 @@ export class UsuariosService {
     return this.db.usuario.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} usuario`;
+  async findOne(id: string) {
+    const usuario = await this.db.usuario.findUnique({ where: { id: id } });
+    if (!usuario) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+    return usuario;
+
   }
 
   update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
