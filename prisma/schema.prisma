@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id          String       @id @default(uuid())
+  nome        String
+  senha       String
+  email       String       @unique
+  nomeUsuario String       @unique
+  criadoEm    DateTime     @default(now())
+  favoritos   Favorito[]
+  avaliacoes  Avaliacao[]
+  comentarios Comentario[]
+}
+
+model Manga {
+  id           String   @id @default(uuid())
+  titulo       String   @unique
+  descricao    String
+  imagem       String?
+  criadoEm     DateTime @default(now())
+  atualizadoEM DateTime @default(now()) @updatedAt
+
+  favoritos      Favorito[]
+  avaliacoes     Avaliacao[]
+  CategoriaManga CategoriaManga[]
+}
+
+model Categoria {
+  id           String   @id @default(uuid())
+  descricao    String
+  mangaId      String
+  criadoEm     DateTime @default(now())
+  atualizadoEM DateTime @default(now()) @updatedAt
+
+  CategoriaManga CategoriaManga[]
+}
+
+model CategoriaManga {
+  idCategoria  String
+  idManga      String
+  criadoEm     DateTime @default(now())
+  atualizadoEM DateTime @default(now()) @updatedAt
+
+  categoria Categoria @relation(fields: [idCategoria], references: [id])
+  manga     Manga     @relation(fields: [idManga], references: [id])
+
+  @@id([idCategoria, idManga])
+}
+
+model Favorito {
+  idUsuario    String
+  idManga      String
+  criadoEm     DateTime @default(now())
+  atualizadoEM DateTime @default(now()) @updatedAt
+
+  usuario Usuario @relation(fields: [idUsuario], references: [id])
+  manga   Manga   @relation(fields: [idManga], references: [id])
+
+  @@id([idUsuario, idManga])
+}
+
+model Avaliacao {
+  idUsuario     String
+  idManga       String
+  classificacao Int
+  criadoEm      DateTime @default(now())
+  atualizadoEM  DateTime @default(now()) @updatedAt
+
+  usuario Usuario @relation(fields: [idUsuario], references: [id])
+  manga   Manga   @relation(fields: [idManga], references: [id])
+
+  @@id([idUsuario, idManga])
+}
+
+model Comentario {
+  idUsuario    String
+  idManga      String
+  comentario   String
+  criadoEm     DateTime @default(now())
+  atualizadoEM DateTime @default(now()) @updatedAt
+
+  usuario Usuario @relation(fields: [idUsuario], references: [id])
+
+  @@id([idUsuario, idManga])
+}
