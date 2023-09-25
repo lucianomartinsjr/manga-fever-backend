@@ -29,7 +29,6 @@ export class UsuariosService {
       throw new NotFoundException('Usuário não encontrado');
     }
     return usuario;
-
   }
 
   update(id: number, updateUsuarioDto: UpdateUsuarioDto) {

@@ -5,7 +5,7 @@ import { UpdateMangasDto } from './dto/update-mangas.dto';
 
 @Controller('mangas')
 export class MangasController {
-  constructor(private readonly mangasService: MangasService) {}
+  constructor(private readonly mangasService: MangasService) { }
 
   @Post()
   create(@Body() createMangasDto: CreateMangasDto) {
@@ -19,7 +19,7 @@ export class MangasController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.mangasService.findOne(+id);
+    return this.mangasService.findOne(id);
   }
 
   @Patch(':id')

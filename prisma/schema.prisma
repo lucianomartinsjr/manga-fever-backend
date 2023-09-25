@@ -38,7 +38,6 @@ model Manga {
 model Categoria {
   id           String   @id @default(uuid())
   descricao    String
-  mangaId      String
   criadoEm     DateTime @default(now())
   atualizadoEM DateTime @default(now()) @updatedAt
 
