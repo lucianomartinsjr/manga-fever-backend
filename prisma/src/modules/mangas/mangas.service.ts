@@ -8,8 +8,21 @@ export class MangasService {
   constructor(private db: PrismaService) { }
 
   async create(createMangasDto: CreateMangasDto) {
+    // this.db.manga.create({ data: { ...createMangasDto, categorias: [] } });
+    // this.db.categoriaManga.create({data:{idCategoria,idManga} })
 
-    return this.db.manga.create({ data: createMangasDto });
+
+    const manga = await this.db.manga.create({
+      data: {
+        titulo: createMangasDto.titulo,
+        descricao: createMangasDto.descricao,
+        imagem: createMangasDto.imagem,
+      }
+    })
+    for (const idCategoria of createMangasDto.categorias) {
+      await this.db.categoriaManga.create({ data: { idCategoria, idManga: manga.id } })
+    }
+    return manga;
   }
 
   findAll() {
@@ -18,8 +31,10 @@ export class MangasService {
 
   async findOne(id: string) {
 
-    const manga = await this.db.manga.findUnique({ where: { id: id } });
+    const manga = await this.db.manga.findUnique({ where: { id: id }, include: { categorias: true } });
+
     if (!manga) {
+
       throw new NotFoundException('Manga não encontrado');
     }
     return manga;

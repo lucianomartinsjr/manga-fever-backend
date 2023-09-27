@@ -30,9 +30,9 @@ model Manga {
   criadoEm     DateTime @default(now())
   atualizadoEM DateTime @default(now()) @updatedAt
 
-  favoritos      Favorito[]
-  avaliacoes     Avaliacao[]
-  CategoriaManga CategoriaManga[]
+  favoritos  Favorito[]
+  avaliacoes Avaliacao[]
+  categorias CategoriaManga[]
 }
 
 model Categoria {
