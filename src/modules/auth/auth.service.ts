@@ -6,8 +6,8 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Usuario } from '@prisma/client';
 import { omitObjectFields as deleteObjectFields } from 'src/helpers/object.helper';
-import { encriptPassword, verifyPassword } from 'src/helpers/senha.helper';
-import { validateusuarioname } from 'src/helpers/validators.helper';
+import { encriptPassword, verifyPassword } from 'src/helpers/password.helper';
+import { validateUsername } from 'src/helpers/validators.helper';
 import { PrismaService } from '../prisma/prisma.service';
 import { EntrarAuthDto } from './dto/entrar-auth.dto';
 import { CadastrarAuthDto } from './dto/cadastrar-auth.dto';
@@ -24,7 +24,7 @@ export class AuthService {
         if (!usuario) {
             return null;
         }
-        if (!(await verifyPassword(senha, usuario.hashedPassword))) {
+        if (!(await verifyPassword(senha, usuario.senha))) {
             return null;
         }
         return usuario;
@@ -44,7 +44,7 @@ export class AuthService {
     }
 
     async cadastrar(cadastrarAuthDto: CadastrarAuthDto) {
-        const validacaoUsuario = validateusuarioname(cadastrarAuthDto.nomeUsuario);
+        const validacaoUsuario = validateUsername(cadastrarAuthDto.nomeUsuario);
         if (validacaoUsuario) {
             throw new BadRequestException(validacaoUsuario);
         }
@@ -66,9 +66,9 @@ export class AuthService {
         const usuarioCreateData = deleteObjectFields(cadastrarAuthDto, ['senha']);
         const usuario = await this.db.usuario.create({
             data: {
-                email: usuarioCreateData.email,
                 nomeUsuario: usuarioCreateData.nomeUsuario,
-                hashedPassword,
+                email: usuarioCreateData.email,
+                senha: hashedPassword,
             },
         });
         return { token: this.jwtService.sign(usuario) };

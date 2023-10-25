@@ -12,9 +12,9 @@ datasource db {
 
 model Usuario {
   id          String       @id @default(uuid())
-  nome        String
-  senha       String
-  email       String       @unique
+  nome        String?
+  senha       String       @map("hashed_password")
+  email       String       @unique()
   nomeUsuario String       @unique
   criadoEm    DateTime     @default(now())
   favoritos   Favorito[]
