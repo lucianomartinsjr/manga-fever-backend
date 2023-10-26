@@ -12,10 +12,11 @@ datasource db {
 
 model Usuario {
   id          String       @id @default(uuid())
-  nome        String
-  senha       String
-  email       String       @unique
+  nome        String?
+  senha       String       @map("hashed_password")
+  email       String       @unique()
   nomeUsuario String       @unique
+  isAdmin     Boolean      @default(false)
   criadoEm    DateTime     @default(now())
   favoritos   Favorito[]
   avaliacoes  Avaliacao[]
@@ -30,15 +31,14 @@ model Manga {
   criadoEm     DateTime @default(now())
   atualizadoEM DateTime @default(now()) @updatedAt
 
-  favoritos      Favorito[]
-  avaliacoes     Avaliacao[]
-  CategoriaManga CategoriaManga[]
+  favoritos  Favorito[]
+  avaliacoes Avaliacao[]
+  categorias CategoriaManga[]
 }
 
 model Categoria {
   id           String   @id @default(uuid())
   descricao    String
-  mangaId      String
   criadoEm     DateTime @default(now())
   atualizadoEM DateTime @default(now()) @updatedAt
 
