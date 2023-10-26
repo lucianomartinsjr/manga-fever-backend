@@ -3,7 +3,6 @@ import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
 const CadastrarAuthSchema = z.object({
-    nome: z.string(),
     nomeUsuario: z.string(),
     email: z.string(),
     senha: z.string(),

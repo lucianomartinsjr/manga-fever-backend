@@ -68,7 +68,7 @@ export class AuthService {
             data: {
                 nomeUsuario: usuarioCreateData.nomeUsuario,
                 email: usuarioCreateData.email,
-                senha: hashedPassword,
+                senha: hashedPassword
             },
         });
         return { token: this.jwtService.sign(usuario) };

@@ -16,6 +16,7 @@ model Usuario {
   senha       String       @map("hashed_password")
   email       String       @unique()
   nomeUsuario String       @unique
+  isAdmin     Boolean      @default(false)
   criadoEm    DateTime     @default(now())
   favoritos   Favorito[]
   avaliacoes  Avaliacao[]

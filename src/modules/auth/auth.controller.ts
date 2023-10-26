@@ -6,7 +6,7 @@ import { CadastrarAuthDto } from './dto/cadastrar-auth.dto';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(private readonly authService: AuthService) { }
 
     @Post('entrar')
     @HttpCode(HttpStatus.OK)

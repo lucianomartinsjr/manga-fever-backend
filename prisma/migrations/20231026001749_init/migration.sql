@@ -1,10 +1,10 @@
 -- CreateTable
 CREATE TABLE "Usuario" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "nome" TEXT NOT NULL,
-    "senha" TEXT NOT NULL,
+    "nome" TEXT,
+    "hashed_password" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "username" TEXT NOT NULL,
+    "nomeUsuario" TEXT NOT NULL,
     "criadoEm" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -22,10 +22,8 @@ CREATE TABLE "Manga" (
 CREATE TABLE "Categoria" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "descricao" TEXT NOT NULL,
-    "mangaId" TEXT,
     "criadoEm" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "atualizadoEM" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "Categoria_mangaId_fkey" FOREIGN KEY ("mangaId") REFERENCES "Manga" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "atualizadoEM" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- CreateTable
@@ -81,7 +79,7 @@ CREATE TABLE "Comentario" (
 CREATE UNIQUE INDEX "Usuario_email_key" ON "Usuario"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Usuario_username_key" ON "Usuario"("username");
+CREATE UNIQUE INDEX "Usuario_nomeUsuario_key" ON "Usuario"("nomeUsuario");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Manga_titulo_key" ON "Manga"("titulo");
