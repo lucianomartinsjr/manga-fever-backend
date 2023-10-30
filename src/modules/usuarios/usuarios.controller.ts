@@ -6,7 +6,7 @@ import { JwtGuard } from 'src/guards/jwt.guard';
 import { AdminGuard } from 'src/guards/admin.guard';
 
 @Controller('usuarios')
-@UseGuards(JwtGuard, AdminGuard)
+//@UseGuards(JwtGuard, AdminGuard)
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) { }
 
@@ -17,7 +17,12 @@ export class UsuariosController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
-    return this.usuariosService.update(+id, updateUsuarioDto);
+    return this.usuariosService.update(id, updateUsuarioDto);
+  }
+
+  @Get()
+  findAll() {
+    return this.usuariosService.findAll();
   }
 
 }
