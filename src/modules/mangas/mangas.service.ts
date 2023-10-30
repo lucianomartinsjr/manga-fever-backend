@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMangasDto } from './dto/create-mangas.dto';
 import { UpdateMangasDto } from './dto/update-mangas.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -8,9 +8,10 @@ export class MangasService {
   constructor(private db: PrismaService) { }
 
   async create(createMangasDto: CreateMangasDto) {
-    // this.db.manga.create({ data: { ...createMangasDto, categorias: [] } });
-    // this.db.categoriaManga.create({data:{idCategoria,idManga} })
 
+    if (!Array.isArray(createMangasDto.categorias)) {
+      throw new BadRequestException('Categorias deve ser um array.');
+    }
 
     const manga = await this.db.manga.create({
       data: {

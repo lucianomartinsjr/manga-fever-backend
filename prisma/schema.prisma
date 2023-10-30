@@ -25,7 +25,7 @@ model Usuario {
 
 model Manga {
   id           String   @id @default(uuid())
-  titulo       String   @unique
+  titulo       String
   descricao    String
   imagem       String?
   criadoEm     DateTime @default(now())

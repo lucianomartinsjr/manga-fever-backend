@@ -9,7 +9,7 @@ import { AdminGuard } from 'src/guards/admin.guard';
 export class MangasController {
   constructor(private readonly mangasService: MangasService) { }
 
-  @Post()
+  @Post("create")
   @UseGuards(JwtGuard, AdminGuard)
   create(@Body() createMangasDto: CreateMangasDto) {
     return this.mangasService.create(createMangasDto);
