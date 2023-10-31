@@ -6,7 +6,7 @@ import { JwtGuard } from 'src/guards/jwt.guard';
 import { AdminGuard } from 'src/guards/admin.guard';
 
 @Controller('usuarios')
-@UseGuards(JwtGuard, AdminGuard)
+@UseGuards(JwtGuard)
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) { }
 

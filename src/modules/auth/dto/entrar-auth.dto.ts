@@ -3,7 +3,7 @@ import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
 const EntrarAuthSchema = z.object({
-    email: z.string().email(),
+    nomeUsuario: z.string(),
     senha: z.string(),
 });
 
