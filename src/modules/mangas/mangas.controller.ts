@@ -2,8 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { MangasService } from './mangas.service';
 import { CreateMangasDto } from './dto/create-mangas.dto';
 import { UpdateMangasDto } from './dto/update-mangas.dto';
-import { JwtGuard } from 'src/guards/jwt.guard';
-import { AdminGuard } from 'src/guards/admin.guard';
+import { JwtGuard } from '../../guards/jwt.guard';
+import { AdminGuard } from '../../guards/admin.guard';
 
 @Controller('mangas')
 export class MangasController {
