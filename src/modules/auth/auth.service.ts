@@ -5,9 +5,9 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Usuario } from '@prisma/client';
-import { omitObjectFields as deleteObjectFields } from 'src/helpers/object.helper';
-import { encriptPassword, verifyPassword } from 'src/helpers/password.helper';
-import { validateUsername } from 'src/helpers/validators.helper';
+import { omitObjectFields as deleteObjectFields } from '../../helpers/object.helper';
+import { encriptPassword, verifyPassword } from '../../helpers/password.helper';
+import { validateUsername } from '../../helpers/validators.helper';
 import { PrismaService } from '../prisma/prisma.service';
 import { EntrarAuthDto } from './dto/entrar-auth.dto';
 import { CadastrarAuthDto } from './dto/cadastrar-auth.dto';

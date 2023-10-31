@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { JwtGuard } from './jwt.guard';
-import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { PrismaService } from '../modules/prisma/prisma.service';
 
 @Injectable()
 export class AdminGuard extends JwtGuard implements CanActivate {
