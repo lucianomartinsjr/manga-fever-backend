@@ -1,21 +1,8 @@
 {
-  "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "dist/main.ts",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "dist/main.ts",
-      "methods": [
-        "GET",
-        "POST",
-        "PUT",
-        "PATCH"
-      ]
+      "source": "/(.*)",
+      "destination": "/"
     }
   ]
 }
