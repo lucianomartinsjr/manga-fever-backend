@@ -5,6 +5,7 @@ CREATE TABLE "Usuario" (
     "hashed_password" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "nomeUsuario" TEXT NOT NULL,
+    "isAdmin" BOOLEAN NOT NULL DEFAULT false,
     "criadoEm" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -80,6 +81,3 @@ CREATE UNIQUE INDEX "Usuario_email_key" ON "Usuario"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Usuario_nomeUsuario_key" ON "Usuario"("nomeUsuario");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Manga_titulo_key" ON "Manga"("titulo");
