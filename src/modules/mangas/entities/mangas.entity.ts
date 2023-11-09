@@ -1,1 +1,3 @@
-export class Mangas {}
+export class Mangas {
+  
+}
