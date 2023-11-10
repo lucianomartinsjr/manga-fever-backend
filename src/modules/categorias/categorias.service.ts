@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -27,15 +27,15 @@ export class CategoriasService {
 
   async update(id: string, updateCategoriaDto: UpdateCategoriaDto) {
     // Use o Prisma Client para encontrar a categoria pelo ID
-    const categoria = await this.db.categoria.findUnique({ where: { id:id } });
+    const categoria = await this.db.categoria.findUnique({ where: { id: id } });
 
     if (!categoria) {
-      throw new Error(`Categoria #${id} não encontrada`);
+      throw new BadRequestException(`Categoria não encontrada`);
     }
 
     // Use o Prisma Client para atualizar os campos da categoria
     const categoriaAtualizada = await this.db.categoria.update({
-      where: { id:id },
+      where: { id: id },
       data: updateCategoriaDto,
     });
 
@@ -44,11 +44,18 @@ export class CategoriasService {
 
   async remove(id: string) {
 
-    const categoria = await this.db.categoria.findUnique({ where: { id:id } });
+    const categoria = await this.db.categoria.findUnique({ where: { id: id } });
     if (!categoria) {
-      throw new Error(`Categoria #${id} não encontrada`);
+      throw new BadRequestException(`Categoria não encontrada`);
     }
-    await this.db.categoria.delete({ where: { id:id } });
-    return `Categoria #${id} removida com sucesso`;
+
+    const mangas = await this.db.categoriaManga.findMany({ where: { idCategoria: id } });
+
+    if (mangas.length > 0) {
+      throw new BadRequestException(`Categoria não pode ser removida pois existem mangas associados a ela`);
+    }
+
+    await this.db.categoria.delete({ where: { id: id } });
+    return `Categoria removida com sucesso`;
   }
 }
