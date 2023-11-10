@@ -23,6 +23,7 @@ export class MangasService {
     for (const idCategoria of createMangasDto.categorias) {
       await this.db.categoriaManga.create({ data: { idCategoria, idManga: manga.id } })
     }
+
     return manga;
   }
 

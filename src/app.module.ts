@@ -8,9 +8,10 @@ import { CategoriasModule } from './modules/categorias/categorias.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { APP_PIPE } from '@nestjs/core';
 import { ZodValidationPipe } from 'nestjs-zod';
+import { ComentariosModule } from './modules/comentarios/comentarios.module';
 
 @Module({
-  imports: [UsuariosModule, MangasModule, CategoriasModule, AuthModule],
+  imports: [UsuariosModule, MangasModule, CategoriasModule, AuthModule, ComentariosModule],
   controllers: [AppController],
   providers: [AppService, PrismaService, {
     provide: APP_PIPE,

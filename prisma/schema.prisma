@@ -33,6 +33,7 @@ model Manga {
   favoritos  Favorito[]
   avaliacoes Avaliacao[]
   categorias CategoriaManga[]
+  Comentario Comentario[]
 }
 
 model Categoria {
@@ -57,6 +58,7 @@ model CategoriaManga {
 }
 
 model Favorito {
+  id           String   @id @default(uuid())
   idUsuario    String
   idManga      String
   criadoEm     DateTime @default(now())
@@ -64,11 +66,10 @@ model Favorito {
 
   usuario Usuario @relation(fields: [idUsuario], references: [id])
   manga   Manga   @relation(fields: [idManga], references: [id])
-
-  @@id([idUsuario, idManga])
 }
 
 model Avaliacao {
+  id            String   @id @default(uuid())
   idUsuario     String
   idManga       String
   classificacao Int
@@ -77,11 +78,10 @@ model Avaliacao {
 
   usuario Usuario @relation(fields: [idUsuario], references: [id])
   manga   Manga   @relation(fields: [idManga], references: [id])
-
-  @@id([idUsuario, idManga])
 }
 
 model Comentario {
+  id           String   @id @default(uuid())
   idUsuario    String
   idManga      String
   comentario   String
@@ -89,6 +89,5 @@ model Comentario {
   atualizadoEM DateTime @default(now()) @updatedAt
 
   usuario Usuario @relation(fields: [idUsuario], references: [id])
-
-  @@id([idUsuario, idManga])
+  manga   Manga   @relation(fields: [idManga], references: [id])
 }
