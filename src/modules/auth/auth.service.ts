@@ -17,10 +17,10 @@ export class AuthService {
     constructor(private db: PrismaService, private jwtService: JwtService) { }
 
     async validarCredencialUsuarios(
-        email: string,
+        nomeUsuario: string,
         senha: string,
     ): Promise<Usuario | null> {
-        const usuario = await this.db.usuario.findFirst({ where: { email } });
+        const usuario = await this.db.usuario.findFirst({ where: { nomeUsuario } });
         if (!usuario) {
             return null;
         }
@@ -32,7 +32,7 @@ export class AuthService {
 
     async entrar(entrarAuthDto: EntrarAuthDto) {
         const usuario = await this.validarCredencialUsuarios(
-            entrarAuthDto.email,
+            entrarAuthDto.nomeUsuario,
             entrarAuthDto.senha,
         );
         if (!usuario) {

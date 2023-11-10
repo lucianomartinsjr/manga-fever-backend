@@ -10,7 +10,9 @@ export class AdminGuard extends JwtGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const user = await this.db.usuario.findUnique({ where: { id: request.user.id! } })
+    console.log(user)
     if (!user.isAdmin) {
+
       throw new UnauthorizedException("O usuário deve ser admin")
     }
     return true;
