@@ -20,7 +20,12 @@ export class UsuariosService {
   }
 
   update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
-    return `This action updates a #${id} usuario`;
+    return this.db.usuario.update({
+      where: { id: String(id) },
+      data: {
+        isAdmin: true,
+      },
+    });
   }
 
   remove(id: number) {
