@@ -12,7 +12,7 @@ export class MangasController {
   constructor(private readonly mangasService: MangasService) { }
 
   @Post("create")
-  @UseGuards(JwtGuard, AdminGuard)
+  @UseGuards(JwtGuard)
   create(@Body() createMangasDto: CreateMangasDto) {
     return this.mangasService.create(createMangasDto);
   }
@@ -28,13 +28,13 @@ export class MangasController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtGuard, AdminGuard)
+  @UseGuards(JwtGuard)
   update(@Param('id') id: string, @Body() updateMangasDto: UpdateMangasDto) {
     return this.mangasService.update(+id, updateMangasDto);
   }
 
   @Delete(':id')
-  @UseGuards(JwtGuard, AdminGuard)
+  @UseGuards(JwtGuard)
   remove(@Param('id') id: string) {
     return this.mangasService.remove(+id);
   }
