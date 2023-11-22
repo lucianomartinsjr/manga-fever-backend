@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { MangasService } from './mangas.service';
 import { CreateMangasDto } from './dto/create-mangas.dto';
 import { UpdateMangasDto } from './dto/update-mangas.dto';
 import { JwtGuard } from '../../guards/jwt.guard';
 import { AdminGuard } from '../../guards/admin.guard';
+import { CreateAvaliacaoDto } from './dto/create-avaliacao.dto';
+import { ApiResponse } from '@nestjs/swagger';
 
 @Controller('mangas')
 export class MangasController {
@@ -36,4 +38,26 @@ export class MangasController {
   remove(@Param('id') id: string) {
     return this.mangasService.remove(+id);
   }
+
+  @Post('avaliar')
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Avaliado com Sucesso.',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description:
+      "Classificação deve ser um número entre 1 e 5."
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description:
+        "Manga ou usuário não encontrado"
+  })
+  async avaliarManga(@Body() CreateAvaliacaoDto: CreateAvaliacaoDto,){
+    return this.mangasService.createAvaliacao(CreateAvaliacaoDto);
+  }
+  
+ 
 }

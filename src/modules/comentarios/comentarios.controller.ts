@@ -11,7 +11,7 @@ export class ComentariosController {
   @Post()
   @UseGuards(JwtGuard)
   create(@Body() createComentarioDto: CreateComentarioDto) {
-    return this.comentariosService.create(createComentarioDto);
+    // return this.comentariosService.create(createComentarioDto);
   }
 
 }
