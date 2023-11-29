@@ -75,34 +75,84 @@ export class MangasService {
   }
 
 
+  // async findOne(id: string) {
+  //   const manga = await this.db.manga.findUnique({
+  //     where: { id: id }, include: {
+  //       categorias: true,
+  //       avaliacoes: true,
+  //     }
+  //   });
+  
+  //   if (!manga) {
+  //     throw new NotFoundException('Manga não encontrado');
+  //   }
+
+  //   const avaliacoes = [];
+
+  //   for (const avaliacao of manga.avaliacoes) {
+  //     avaliacoes.push(avaliacao);
+  //   }
+
+  //   console.log(avaliacoes)
+  
+  //   const media = avaliacoes.length > 0 ? avaliacoes.reduce((total, avaliacao) => total + avaliacao.classificacao, 0) / avaliacoes.length : null;
+  
+  //   return {
+  //     id: manga.id,
+  //     titulo: manga.titulo,
+  //     descricao: manga.descricao,
+  //     imagem: manga.imagem,
+  //     categorias: manga.categorias,
+  //     nota: media,
+  //   };
+  // }
+  
   async findOne(id: string) {
     const manga = await this.db.manga.findUnique({
-      where: { id: id }, include: {
+      where: { id: id },
+      include: {
         categorias: true,
         avaliacoes: true,
-      }
+      },
     });
   
     if (!manga) {
       throw new NotFoundException('Manga não encontrado');
     }
-
-    const avaliacoes = [];
-
-    for (const avaliacao of manga.avaliacoes) {
-      avaliacoes.push(avaliacao);
-    }
-
-    console.log(avaliacoes)
   
-    const media = avaliacoes.length > 0 ? avaliacoes.reduce((total, avaliacao) => total + avaliacao.classificacao, 0) / avaliacoes.length : null;
+    const avaliacoes = manga.avaliacoes || [];
+  
+    const media =
+      avaliacoes.length > 0
+        ? avaliacoes.reduce((total, avaliacao) => total + avaliacao.classificacao, 0) / avaliacoes.length
+        : null;
+  
+    // Extrai os IDs das categorias do relacionamento CategoriaManga
+    const idsCategorias = manga.categorias.map((categoriaManga) => categoriaManga.idCategoria);
+  
+    // Consulta as categorias pelo ID para obter os nomes
+    const categorias = await this.db.categoria.findMany({
+      where: {
+        id: {
+          in: idsCategorias,
+        },
+      },
+    });
+  
+    // Mapeia as categorias para retornar apenas os campos desejados (id e descricao)
+    const categoriasFormatadas = categorias.map((categoria) => {
+      return {
+        id: categoria.id,
+        descricao: categoria.descricao,
+      };
+    });
   
     return {
       id: manga.id,
       titulo: manga.titulo,
       descricao: manga.descricao,
       imagem: manga.imagem,
-      categorias: manga.categorias,
+      categorias: categoriasFormatadas,
       nota: media,
     };
   }
