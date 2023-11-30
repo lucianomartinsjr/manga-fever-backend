@@ -6,6 +6,7 @@ import { JwtGuard } from '../../guards/jwt.guard';
 import { AdminGuard } from '../../guards/admin.guard';
 import { CreateAvaliacaoDto } from './dto/create-avaliacao.dto';
 import { ApiResponse } from '@nestjs/swagger';
+import { FavoritarMangaDto } from './dto/favorite-manga.dto';
 
 @Controller('mangas')
 export class MangasController {
@@ -23,21 +24,25 @@ export class MangasController {
   }
 
   @Get(':id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Encontrado com Sucesso.',
+  })
   findOne(@Param('id') id: string) {
     return this.mangasService.findOne(id);
   }
 
-  @Patch(':id')
-  @UseGuards(JwtGuard)
-  update(@Param('id') id: string, @Body() updateMangasDto: UpdateMangasDto) {
-    return this.mangasService.update(+id, updateMangasDto);
-  }
+  // @Patch(':id')
+  // @UseGuards(JwtGuard)
+  // update(@Param('id') id: string, @Body() updateMangasDto: UpdateMangasDto) {
+  //   return this.mangasService.update(+id, updateMangasDto);
+  // }
 
-  @Delete(':id')
-  @UseGuards(JwtGuard)
-  remove(@Param('id') id: string) {
-    return this.mangasService.remove(+id);
-  }
+  // @Delete(':id')
+  // @UseGuards(JwtGuard)
+  // remove(@Param('id') id: string) {
+  //   return this.mangasService.remove(+id);
+  // }
 
   @Post('avaliar')
   @HttpCode(HttpStatus.OK)
@@ -58,6 +63,21 @@ export class MangasController {
   async avaliarManga(@Body() CreateAvaliacaoDto: CreateAvaliacaoDto,){
     return this.mangasService.createAvaliacao(CreateAvaliacaoDto);
   }
+
+  @Post('/favoritar')
+  @UseGuards(JwtGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Mangá favoritado com sucesso.',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Mangá não encontrado.',
+  })
+  async favoritarManga(@Param('id') mangaId: string, @Body() favoritarMangaDto: FavoritarMangaDto) {
+    // Utilize favoritarMangaDto.idUsuario e favoritarMangaDto.idManga para obter os dados
+    return this.mangasService.favoritarManga(favoritarMangaDto);
+  }
   
- 
 }

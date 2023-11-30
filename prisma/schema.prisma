@@ -58,14 +58,15 @@ model CategoriaManga {
 }
 
 model Favorito {
-  id           String   @id @default(uuid())
   idUsuario    String
   idManga      String
   criadoEm     DateTime @default(now())
   atualizadoEM DateTime @default(now()) @updatedAt
 
-  usuario Usuario @relation(fields: [idUsuario], references: [id])
-  manga   Manga   @relation(fields: [idManga], references: [id])
+  usuario Usuario @relation(fields: [idUsuario], references: [id]) // Define a relação com Usuario
+  manga   Manga   @relation(fields: [idManga], references: [id]) // Define a relação com Manga
+
+  @@id([idUsuario, idManga])
 }
 
 model Avaliacao {

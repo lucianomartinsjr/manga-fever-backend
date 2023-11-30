@@ -3,6 +3,7 @@ import { CreateMangasDto } from './dto/create-mangas.dto';
 import { CreateAvaliacaoDto } from './dto/create-avaliacao.dto';
 import { UpdateMangasDto } from './dto/update-mangas.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { FavoritarMangaDto } from './dto/favorite-manga.dto';
 
 @Injectable()
 export class MangasService {
@@ -179,12 +180,56 @@ export class MangasService {
     return avaliacao;
   }
 
-  update(id: number, updateMangasDto: UpdateMangasDto) {
-    return `This action updates a #${id} mangas`;
+
+async favoritarManga(favoritarMangaDto: FavoritarMangaDto) {
+  const manga = await this.db.manga.findUnique({
+    where: { id: favoritarMangaDto.idManga },
+  });
+
+  if (!manga) {
+    throw new NotFoundException('Mangá não encontrado.');
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} mangas`;
+  const user = await this.db.usuario.findUnique({
+    where: { id: favoritarMangaDto.idUsuario },
+  });
+
+  if (!user) {
+    throw new NotFoundException('Usuário não encontrado.');
   }
+
+  return this.db.$transaction(async (prisma) => {
+    // Verifica se já existe um registro na tabela Favorito para esse usuário e mangá
+    const favoritoExistente = await prisma.favorito.findFirst({
+      where: {
+        idUsuario: favoritarMangaDto.idUsuario,
+        idManga: favoritarMangaDto.idManga,
+      },
+    });
+
+    if (favoritoExistente) {
+      // Se existir, remove o registro (desfavoritar)
+      await prisma.favorito.delete({
+        where: {
+          idUsuario_idManga: favoritoExistente,
+        },
+      });
+
+      return { message: 'Mangá removido dos favoritos com sucesso.' };
+    } else {
+      // Se não existir, adiciona o registro (favoritar)
+      await prisma.favorito.create({
+        data: {
+          idUsuario: favoritarMangaDto.idUsuario,
+          idManga: favoritarMangaDto.idManga,
+        },
+      });
+
+      return { message: 'Mangá favoritado com sucesso.' };
+    }
+  });
+}
+
+  
 
 }
