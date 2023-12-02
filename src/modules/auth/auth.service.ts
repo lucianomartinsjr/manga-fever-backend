@@ -11,6 +11,7 @@ import { validateUsername } from '../../helpers/validators.helper';
 import { PrismaService } from '../prisma/prisma.service';
 import { EntrarAuthDto } from './dto/entrar-auth.dto';
 import { CadastrarAuthDto } from './dto/cadastrar-auth.dto';
+import { LoginResponseDto } from './dto/login-response-dto';
 
 @Injectable()
 export class AuthService {
@@ -30,16 +31,38 @@ export class AuthService {
         return usuario;
     }
 
-    async entrar(entrarAuthDto: EntrarAuthDto) {
+    // async entrar(entrarAuthDto: EntrarAuthDto) {
+    //     const usuario = await this.validarCredencialUsuarios(
+    //         entrarAuthDto.nomeUsuario,
+    //         entrarAuthDto.senha,
+    //     );
+    //     if (!usuario) {
+    //         throw new UnauthorizedException('Nome de usuário ou senha está inválida.');
+    //     }
+    //     return {
+    //         token: this.jwtService.sign(usuario),
+    //     };
+    // }
+    
+    async entrar(entrarAuthDto: EntrarAuthDto): Promise<LoginResponseDto> {
         const usuario = await this.validarCredencialUsuarios(
             entrarAuthDto.nomeUsuario,
             entrarAuthDto.senha,
         );
+        
         if (!usuario) {
             throw new UnauthorizedException('Nome de usuário ou senha está inválida.');
         }
+    
+        const token = this.jwtService.sign({
+            id: usuario.id,
+            isAdmin: usuario.isAdmin,
+        });
+    
         return {
-            token: this.jwtService.sign(usuario),
+            token,
+            id: usuario.id,
+            isAdmin: usuario.isAdmin,
         };
     }
 
