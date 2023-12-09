@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { MangasService } from './mangas.service';
 import { CreateMangasDto } from './dto/create-mangas.dto';
-import { UpdateMangasDto } from './dto/update-mangas.dto';
 import { JwtGuard } from '../../guards/jwt.guard';
 import { AdminGuard } from '../../guards/admin.guard';
 import { CreateAvaliacaoDto } from './dto/create-avaliacao.dto';
@@ -55,7 +54,7 @@ export class MangasController {
   //   return this.mangasService.remove(+id);
   // }
 
-  @Post('avaliar')
+  @Post('avaliar/:id')
   @UseGuards(JwtGuard)
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
@@ -72,8 +71,12 @@ export class MangasController {
     description:
         "Manga ou usuário não encontrado"
   })
-  async avaliarManga(@Body() CreateAvaliacaoDto: CreateAvaliacaoDto,){
-    return this.mangasService.createAvaliacao(CreateAvaliacaoDto);
+  async avaliarManga(
+    @Body() createAvaliacaoDto: CreateAvaliacaoDto,
+    @CurrentUser() currentUser:Usuario,
+    @Param('id') id: string,
+    ){
+    return this.mangasService.createAvaliacao(createAvaliacaoDto,currentUser,id);
   }
 
   @Post('/favoritar/:id')
@@ -87,8 +90,8 @@ export class MangasController {
     status: HttpStatus.NOT_FOUND,
     description: 'Mangá não encontrado.',
   })
-  async favoritarManga(@CurrentUser() currentUser: Usuario, @Param('id') id: string) {
-    return this.mangasService.favoritarManga(currentUser,id);
+  async favoritarManga(@CurrentUser() CurrentUser: Usuario, @Param('id') id: string) {
+    return this.mangasService.favoritarManga(CurrentUser,id);
   }
   
 }

@@ -190,25 +190,49 @@ export class MangasService {
   
 
 
-  async createAvaliacao(CreateAvaliacaoDto: CreateAvaliacaoDto) {
-    const manga = await this.db.manga.findUnique({ where: { id: CreateAvaliacaoDto.idManga } });
-    const usuario = await this.db.usuario.findUnique({ where: { id: CreateAvaliacaoDto.idUsuario } });
+  async createAvaliacao(CreateAvaliacaoDto, CurrentUser, id: string) {
+    const manga = await this.db.manga.findUnique({ where: { id } });
+    const usuario = await this.db.usuario.findUnique({ where: { id: CurrentUser.user.id } });
+  
     if (!manga || !usuario) {
       throw new NotFoundException('Manga ou usuário não encontrado');
     }
-    
-     if (isNaN(CreateAvaliacaoDto.classificacao) ||CreateAvaliacaoDto.classificacao < 1 || CreateAvaliacaoDto.classificacao > 5) {
+  
+    if (isNaN(CreateAvaliacaoDto.classificacao) || CreateAvaliacaoDto.classificacao < 1 || CreateAvaliacaoDto.classificacao > 5) {
       throw new BadRequestException('Classificação deve ser um número entre 1 e 5.');
-     }
-    const avaliacao = await this.db.avaliacao.create({
-      data: {
-        idManga: CreateAvaliacaoDto.idManga,
-        idUsuario: CreateAvaliacaoDto.idUsuario,
-        classificacao: CreateAvaliacaoDto.classificacao
+    }
+  
+    return this.db.$transaction(async (prisma) => {
+      // Check if the user has already rated the manga
+      const existingAvaliacao = await prisma.avaliacao.findFirst({
+        where: {
+          idManga: id,
+          idUsuario: CurrentUser.user.id,
+        },
+      });
+  
+      if (existingAvaliacao) {
+        // If an existing rating is found, delete it
+        await prisma.avaliacao.delete({
+          where: {
+            id: existingAvaliacao.id,
+          },
+        });
       }
+  
+      // Create the new evaluation
+      const newAvaliacao = await prisma.avaliacao.create({
+        data: {
+          idManga: id,
+          idUsuario: CurrentUser.user.id,
+          classificacao: CreateAvaliacaoDto.classificacao,
+        },
+      });
+  
+      return { message: 'Avaliação criada ou atualizada com sucesso.', novaAvaliacao: newAvaliacao };
     });
-    return avaliacao;
   }
+  
 
 
   async favoritarManga(currentUser, id: string) {
