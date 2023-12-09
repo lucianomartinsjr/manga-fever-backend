@@ -58,15 +58,16 @@ model CategoriaManga {
 }
 
 model Favorito {
-  idUsuario    String
-  idManga      String
+  idUsuario    String   @map("user_id")
+  idManga      String   @map("manga_id")
   criadoEm     DateTime @default(now())
   atualizadoEM DateTime @default(now()) @updatedAt
 
-  usuario Usuario @relation(fields: [idUsuario], references: [id]) // Define a relação com Usuario
-  manga   Manga   @relation(fields: [idManga], references: [id]) // Define a relação com Manga
+  usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade) // Define a relação com Usuario
+  manga   Manga   @relation(fields: [idManga], references: [id], onDelete: Cascade) // Define a relação com Manga
 
   @@id([idUsuario, idManga])
+  @@map("favoritos")
 }
 
 model Avaliacao {

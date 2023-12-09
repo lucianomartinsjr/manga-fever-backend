@@ -6,14 +6,15 @@ import { JwtGuard } from '../../guards/jwt.guard';
 import { AdminGuard } from '../../guards/admin.guard';
 import { CreateAvaliacaoDto } from './dto/create-avaliacao.dto';
 import { ApiResponse } from '@nestjs/swagger';
-import { FavoritarMangaDto } from './dto/favorite-manga.dto';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { Usuario } from '@prisma/client';
 
 @Controller('mangas')
 export class MangasController {
   constructor(private readonly mangasService: MangasService) { }
 
   @Post("create")
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard,AdminGuard)
   create(@Body() createMangasDto: CreateMangasDto) {
     return this.mangasService.create(createMangasDto);
   }
@@ -23,10 +24,20 @@ export class MangasController {
     return this.mangasService.findAll();
   }
 
+  @Get('user')
+  @UseGuards(JwtGuard)
+  findAllLogged(@CurrentUser() currentUser ) {
+    return this.mangasService.findAllLogged(currentUser);
+  }
+
   @Get(':id')
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Encontrado com Sucesso.',
+    description: 'Busca postagem pelo ID.',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Postagem não encontrada.',
   })
   findOne(@Param('id') id: string) {
     return this.mangasService.findOne(id);
@@ -45,6 +56,7 @@ export class MangasController {
   // }
 
   @Post('avaliar')
+  @UseGuards(JwtGuard)
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
@@ -64,7 +76,7 @@ export class MangasController {
     return this.mangasService.createAvaliacao(CreateAvaliacaoDto);
   }
 
-  @Post('/favoritar')
+  @Post('/favoritar/:id')
   @UseGuards(JwtGuard)
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
@@ -75,9 +87,8 @@ export class MangasController {
     status: HttpStatus.NOT_FOUND,
     description: 'Mangá não encontrado.',
   })
-  async favoritarManga(@Param('id') mangaId: string, @Body() favoritarMangaDto: FavoritarMangaDto) {
-    // Utilize favoritarMangaDto.idUsuario e favoritarMangaDto.idManga para obter os dados
-    return this.mangasService.favoritarManga(favoritarMangaDto);
+  async favoritarManga(@CurrentUser() currentUser: Usuario, @Param('id') id: string) {
+    return this.mangasService.favoritarManga(currentUser,id);
   }
   
 }

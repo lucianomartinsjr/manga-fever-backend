@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsuariosModule } from './modules/usuarios/usuarios.module';
 import { PrismaService } from './modules/prisma/prisma.service';
@@ -11,11 +10,21 @@ import { ZodValidationPipe } from 'nestjs-zod';
 import { ComentariosModule } from './modules/comentarios/comentarios.module';
 
 @Module({
-  imports: [UsuariosModule, MangasModule, CategoriasModule, AuthModule, ComentariosModule],
-  controllers: [AppController],
-  providers: [AppService, PrismaService, {
-    provide: APP_PIPE,
-    useClass: ZodValidationPipe,
-  }],
+  imports: [
+    UsuariosModule,
+    MangasModule,
+    CategoriasModule,
+    AuthModule,
+    ComentariosModule
+  ],
+  controllers: [],
+  providers: [
+      AppService, 
+      PrismaService,
+      {
+      provide: APP_PIPE,
+      useClass: ZodValidationPipe,
+    }
+  ],
 })
 export class AppModule { }

@@ -1,9 +1,15 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { 
+  BadRequestException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common';
+import { Usuario } from '@prisma/client';
 import { CreateMangasDto } from './dto/create-mangas.dto';
 import { CreateAvaliacaoDto } from './dto/create-avaliacao.dto';
-import { UpdateMangasDto } from './dto/update-mangas.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { FavoritarMangaDto } from './dto/favorite-manga.dto';
+
+
+
 
 @Injectable()
 export class MangasService {
@@ -29,24 +35,78 @@ export class MangasService {
     return manga;
   }
 
-  // findAll() {
-  //   return this.db.manga.findMany();
-  // }
+
+  async findAllLogged(currentUser) {
+
+    const mangas = await this.db.manga.findMany({
+      include: {
+        categorias: true,
+        avaliacoes: true,
+      },
+    });
+  
+    // Criando uma lista vazia para armazenar os mangás formatados
+    const mangasFormatados = [];
+  
+    for (const manga of mangas) {
+      const avaliacoes = [];
+  
+      // Percorrendo cada avaliação do mangá
+      for (const avaliacao of manga.avaliacoes) {
+        // Adicionando a avaliação à lista
+        avaliacoes.push(avaliacao);
+      }
+  
+      // Calculando a média das avaliações do mangá
+      const media =
+        avaliacoes.length > 0
+          ? avaliacoes.reduce(
+              (total, avaliacao) => total + avaliacao.classificacao,
+              0
+            ) / avaliacoes.length
+          : null;
+            
+      // Verificando se o mangá é favorito para o usuário
+      const favorito = await this.db.favorito.findUnique({
+        where: {
+          idUsuario_idManga: {
+            idUsuario: currentUser.user.id,
+            idManga: manga.id,
+          },
+        },
+      });
+  
+      // Criando um objeto com os dados do mangá formatados
+      const mangaFormatado = {
+        id: manga.id,
+        titulo: manga.titulo,
+        imagem: manga.imagem,
+        categorias: manga.categorias,
+        nota: media,
+        userFavorite: favorito !== null, // Indica se o mangá é favorito para o usuário
+      };
+  
+      // Adicionando o mangá formatado à lista
+      mangasFormatados.push(mangaFormatado);
+    }
+  
+    // Retornando a lista de mangás formatados
+    return mangasFormatados;
+  }
+  
 
   async findAll(){
      const mangas = await this.db.manga.findMany({
     include: {
     categorias: true,
-    avaliacoes: true
+    avaliacoes: true,
     }
     });
 
     // Criando uma lista vazia para armazenar os mangás formatados
     const mangasFormatados = [];
 
-    // Percorrendo cada mangá da lista
     for (const manga of mangas) {
-    // Criando uma lista vazia para armazenar as avaliações do mangá
     const avaliacoes = [];
 
     // Percorrendo cada avaliação do mangá
@@ -58,13 +118,15 @@ export class MangasService {
     // Calculando a média das avaliações do mangá
     const media = avaliacoes.length > 0 ? avaliacoes.reduce((total, avaliacao) => total + avaliacao.classificacao, 0) / avaliacoes.length : null;
 
+
     // Criando um objeto com os dados do mangá formatados
     const mangaFormatado = {
     id: manga.id,
     titulo: manga.titulo,
     imagem: manga.imagem,
     categorias: manga.categorias,
-    nota: media
+    nota: media,
+    userFavorite: false 
     };
 
     // Adicionando o mangá formatado à lista
@@ -75,38 +137,6 @@ export class MangasService {
     return mangasFormatados;
   }
 
-
-  // async findOne(id: string) {
-  //   const manga = await this.db.manga.findUnique({
-  //     where: { id: id }, include: {
-  //       categorias: true,
-  //       avaliacoes: true,
-  //     }
-  //   });
-  
-  //   if (!manga) {
-  //     throw new NotFoundException('Manga não encontrado');
-  //   }
-
-  //   const avaliacoes = [];
-
-  //   for (const avaliacao of manga.avaliacoes) {
-  //     avaliacoes.push(avaliacao);
-  //   }
-
-  //   console.log(avaliacoes)
-  
-  //   const media = avaliacoes.length > 0 ? avaliacoes.reduce((total, avaliacao) => total + avaliacao.classificacao, 0) / avaliacoes.length : null;
-  
-  //   return {
-  //     id: manga.id,
-  //     titulo: manga.titulo,
-  //     descricao: manga.descricao,
-  //     imagem: manga.imagem,
-  //     categorias: manga.categorias,
-  //     nota: media,
-  //   };
-  // }
   
   async findOne(id: string) {
     const manga = await this.db.manga.findUnique({
@@ -181,55 +211,55 @@ export class MangasService {
   }
 
 
-async favoritarManga(favoritarMangaDto: FavoritarMangaDto) {
-  const manga = await this.db.manga.findUnique({
-    where: { id: favoritarMangaDto.idManga },
-  });
-
-  if (!manga) {
-    throw new NotFoundException('Mangá não encontrado.');
+  async favoritarManga(currentUser, id: string) {
+    const manga = await this.db.manga.findUnique({ where: { id } });
+  
+    if (!manga) {
+      throw new NotFoundException('Mangá não encontrado.');
+    }
+  
+    const favoritoExistente = await this.checkFavoritoExistence(currentUser.user.id, id);
+  
+    return this.db.$transaction(async (prisma) => {
+      if (favoritoExistente) {
+        await this.desfavoritarManga(prisma, currentUser.user.id, id);
+        return { message: 'Mangá removido dos favoritos com sucesso.' };
+      } else {
+        await this.criarfavoritoManga(prisma, currentUser.user.id, id);
+        return { message: 'Mangá favoritado com sucesso.' };
+      }
+    });
   }
-
-  const user = await this.db.usuario.findUnique({
-    where: { id: favoritarMangaDto.idUsuario },
-  });
-
-  if (!user) {
-    throw new NotFoundException('Usuário não encontrado.');
-  }
-
-  return this.db.$transaction(async (prisma) => {
-    // Verifica se já existe um registro na tabela Favorito para esse usuário e mangá
-    const favoritoExistente = await prisma.favorito.findFirst({
+  
+  private async checkFavoritoExistence(userId: string, mangaId: string): Promise<boolean> {
+    const favoritoExistente = await this.db.favorito.findFirst({
       where: {
-        idUsuario: favoritarMangaDto.idUsuario,
-        idManga: favoritarMangaDto.idManga,
+        AND: [
+          { idUsuario: userId },
+          { idManga: mangaId },
+        ],
       },
     });
-
-    if (favoritoExistente) {
-      // Se existir, remove o registro (desfavoritar)
-      await prisma.favorito.delete({
-        where: {
-          idUsuario_idManga: favoritoExistente,
-        },
-      });
-
-      return { message: 'Mangá removido dos favoritos com sucesso.' };
-    } else {
-      // Se não existir, adiciona o registro (favoritar)
-      await prisma.favorito.create({
-        data: {
-          idUsuario: favoritarMangaDto.idUsuario,
-          idManga: favoritarMangaDto.idManga,
-        },
-      });
-
-      return { message: 'Mangá favoritado com sucesso.' };
-    }
-  });
-}
-
+    return Boolean(favoritoExistente);
+  }
   
-
+  private async desfavoritarManga(prisma, userId: string, mangaId: string): Promise<void> {
+    await prisma.favorito.deleteMany({
+      where: {
+        AND: [
+          { idUsuario: userId },
+          { idManga: mangaId },
+        ],
+      },
+    });
+  }
+  
+  private async criarfavoritoManga(prisma, userId: string, mangaId: string): Promise<void> {
+    await prisma.favorito.create({
+      data: {
+        idUsuario: userId,
+        idManga: mangaId,
+      },
+    });
+  }
 }

@@ -13,9 +13,13 @@ import { EntrarAuthDto } from './dto/entrar-auth.dto';
 import { CadastrarAuthDto } from './dto/cadastrar-auth.dto';
 import { LoginResponseDto } from './dto/login-response-dto';
 
+
 @Injectable()
 export class AuthService {
-    constructor(private db: PrismaService, private jwtService: JwtService) { }
+    constructor(
+        private db: PrismaService,
+         private jwtService: JwtService,
+    ){}
 
     async validarCredencialUsuarios(
         nomeUsuario: string,
@@ -54,15 +58,9 @@ export class AuthService {
             throw new UnauthorizedException('Nome de usuário ou senha está inválida.');
         }
     
-        const token = this.jwtService.sign({
-            id: usuario.id,
-            isAdmin: usuario.isAdmin,
-        });
-    
         return {
-            token,
-            id: usuario.id,
-            isAdmin: usuario.isAdmin,
+            token:this.jwtService.sign({user:usuario}),
+            isAdmin: usuario.isAdmin
         };
     }
 
