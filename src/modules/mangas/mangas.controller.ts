@@ -13,6 +13,10 @@ export class MangasController {
   constructor(private readonly mangasService: MangasService) { }
 
   @Post("create")
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Cria um mangá',
+  })
   @UseGuards(JwtGuard,AdminGuard)
   create(@Body() createMangasDto: CreateMangasDto) {
     return this.mangasService.create(createMangasDto);
