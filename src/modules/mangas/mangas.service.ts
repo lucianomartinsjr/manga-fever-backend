@@ -36,8 +36,7 @@ export class MangasService {
   }
 
 
-  async findAllLogged(currentUser) {
-
+  async findAllLogged(CurrentUser: Usuario) {
     const mangas = await this.db.manga.findMany({
       include: {
         categorias: true,
@@ -70,7 +69,7 @@ export class MangasService {
       const favorito = await this.db.favorito.findUnique({
         where: {
           idUsuario_idManga: {
-            idUsuario: currentUser.user.id,
+            idUsuario: CurrentUser.id,
             idManga: manga.id,
           },
         },
@@ -190,9 +189,9 @@ export class MangasService {
   
 
 
-  async createAvaliacao(CreateAvaliacaoDto, CurrentUser, id: string) {
+  async createAvaliacao(CreateAvaliacaoDto, CurrentUser: Usuario, id: string) {
     const manga = await this.db.manga.findUnique({ where: { id } });
-    const usuario = await this.db.usuario.findUnique({ where: { id: CurrentUser.user.id } });
+    const usuario = await this.db.usuario.findUnique({ where: { id: CurrentUser.id } });
   
     if (!manga || !usuario) {
       throw new NotFoundException('Manga ou usuário não encontrado');
@@ -207,7 +206,7 @@ export class MangasService {
       const existingAvaliacao = await prisma.avaliacao.findFirst({
         where: {
           idManga: id,
-          idUsuario: CurrentUser.user.id,
+          idUsuario: CurrentUser.id,
         },
       });
   
@@ -224,7 +223,7 @@ export class MangasService {
       const newAvaliacao = await prisma.avaliacao.create({
         data: {
           idManga: id,
-          idUsuario: CurrentUser.user.id,
+          idUsuario: CurrentUser.id,
           classificacao: CreateAvaliacaoDto.classificacao,
         },
       });
@@ -235,21 +234,21 @@ export class MangasService {
   
 
 
-  async favoritarManga(currentUser, id: string) {
+  async favoritarManga(CurrentUser: Usuario, id: string) {
     const manga = await this.db.manga.findUnique({ where: { id } });
   
     if (!manga) {
       throw new NotFoundException('Mangá não encontrado.');
     }
   
-    const favoritoExistente = await this.checkFavoritoExistence(currentUser.user.id, id);
+    const favoritoExistente = await this.checkFavoritoExistence(CurrentUser.id, id);
   
     return this.db.$transaction(async (prisma) => {
       if (favoritoExistente) {
-        await this.desfavoritarManga(prisma, currentUser.user.id, id);
+        await this.desfavoritarManga(prisma, CurrentUser.id, id);
         return { message: 'Mangá removido dos favoritos com sucesso.' };
       } else {
-        await this.criarfavoritoManga(prisma, currentUser.user.id, id);
+        await this.criarfavoritoManga(prisma, CurrentUser.id, id);
         return { message: 'Mangá favoritado com sucesso.' };
       }
     });

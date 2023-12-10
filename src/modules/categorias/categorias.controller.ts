@@ -10,7 +10,7 @@ export class CategoriasController {
   constructor(private readonly categoriasService: CategoriasService) { }
 
   @Post()
-  @UseGuards(JwtGuard, AdminGuard)
+  @UseGuards(JwtGuard)
   create(@Body() createCategoriaDto: CreateCategoriaDto) {
     return this.categoriasService.create(createCategoriaDto);
   }

@@ -2,8 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { async } from 'rxjs';
-import { string } from 'zod';
+
 
 @Injectable()
 export class CategoriasService {

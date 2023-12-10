@@ -59,7 +59,7 @@ export class AuthService {
         }
     
         return {
-            token:this.jwtService.sign({user:usuario}),
+            token:this.jwtService.sign(usuario),
             isAdmin: usuario.isAdmin
         };
     }
@@ -85,13 +85,13 @@ export class AuthService {
         }
         const hashedPassword = await encriptPassword(cadastrarAuthDto.senha);
         const usuarioCreateData = deleteObjectFields(cadastrarAuthDto, ['senha']);
-        const usuario = await this.db.usuario.create({
+        const user = await this.db.usuario.create({
             data: {
                 nomeUsuario: usuarioCreateData.nomeUsuario,
                 email: usuarioCreateData.email,
                 senha: hashedPassword
             },
         });
-        return { token: this.jwtService.sign(usuario) };
+        return { token: this.jwtService.sign(user) };
     }
 }

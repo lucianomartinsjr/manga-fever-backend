@@ -17,7 +17,7 @@ export class MangasController {
     status: HttpStatus.CREATED,
     description: 'Cria um mangá',
   })
-  @UseGuards(JwtGuard,AdminGuard)
+  @UseGuards(JwtGuard)
   create(@Body() createMangasDto: CreateMangasDto) {
     return this.mangasService.create(createMangasDto);
   }
