@@ -155,7 +155,7 @@ export class MangasService {
     const media =
       avaliacoes.length > 0
         ? avaliacoes.reduce((total, avaliacao) => total + avaliacao.classificacao, 0) / avaliacoes.length
-        : null;
+        : 0.0;
   
     // Extrai os IDs das categorias do relacionamento CategoriaManga
     const idsCategorias = manga.categorias.map((categoriaManga) => categoriaManga.idCategoria);
